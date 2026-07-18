@@ -5,11 +5,10 @@ AFRAME.registerSystem('mindar-image-system', {
   container: null,
   video: null,
   processingImage: false,
-
+  shouldFaceUser: false,
   init: function() {
     this.anchorEntities = [];
   },
-
   tick: function() {
   },
 
@@ -56,6 +55,12 @@ AFRAME.registerSystem('mindar-image-system', {
     this.controller.dispose();
   },
 
+  switchCamera: function() {
+    this.shouldFaceUser = !this.shouldFaceUser;
+    this.stop();
+    this.start();
+  },
+
   pause: function(keepVideo=false) {
     if (!keepVideo) {
       this.video.pause();
@@ -88,7 +93,7 @@ AFRAME.registerSystem('mindar-image-system', {
     }
 
     navigator.mediaDevices.getUserMedia({audio: false, video: {
-      facingMode: 'environment',
+      facingMode: (this.shouldFaceUser ? 'user': 'environment'),
     }}).then((stream) => {
       this.video.addEventListener( 'loadedmetadata', () => {
         //console.log("video ready...", this.video);
@@ -110,7 +115,7 @@ AFRAME.registerSystem('mindar-image-system', {
     this.controller = new Controller({
       inputWidth: video.videoWidth,
       inputHeight: video.videoHeight,
-      maxTrack: this.maxTrack, 
+      maxTrack: this.maxTrack,
       filterMinCF: this.filterMinCF,
       filterBeta: this.filterBeta,
       missTolerance: this.missTolerance,
@@ -220,7 +225,7 @@ AFRAME.registerComponent('mindar-image', {
     const arSystem = this.el.sceneEl.systems['mindar-image-system'];
 
     arSystem.setup({
-      imageTargetSrc: this.data.imageTargetSrc, 
+      imageTargetSrc: this.data.imageTargetSrc,
       maxTrack: this.data.maxTrack,
       filterMinCF: this.data.filterMinCF === -1? null: this.data.filterMinCF,
       filterBeta: this.data.filterBeta === -1? null: this.data.filterBeta,
@@ -236,7 +241,7 @@ AFRAME.registerComponent('mindar-image', {
         arSystem.start();
       });
     }
-  },  
+  },
   remove: function () {
     const arSystem = this.el.sceneEl.systems['mindar-image-system'];
     arSystem.stop();
@@ -301,7 +306,7 @@ AFRAME.registerComponent('mindar-image-target', {
 This is a hack.
 If the user's browser has cached A-Frame,
 then A-Frame will process the webpage *before* the system and components get registered.
-Resulting in a blank page. This happens because module loading is deferred. 
+Resulting in a blank page. This happens because module loading is deferred.
 */
 /* if(needsDOMRefresh){
   console.log("mindar-face-aframe::Refreshing DOM...")
