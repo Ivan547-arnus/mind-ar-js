@@ -1,22 +1,7 @@
 {
-  "name": "mind-ar",
+  "name": "ivan-mind-ar",
   "version": "1.2.5",
   "description": "web augmented reality framework",
-  "main": "index.js",
-  "scripts": {
-    "dev": "vite --config vite.config.dev.js --host",
-    "watch": "vite build --watch --config vite.config.dev.js",
-    "build-dev": "vite build --config vite.config.dev.js",
-    "build": "vite build --config vite.config.prod.js"
-  },
-  "engines": {
-    "node": ">=14.0.0"
-  },
-  "type": "module",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hiukim/mind-ar-js"
-  },
   "keywords": [
     "web AR",
     "aframe",
@@ -26,8 +11,28 @@
     "tensorflowjs",
     "mediapipe"
   ],
-  "author": "hiukim",
+  "homepage": "https://github.com/Ivan547-arnus/mind-ar-js#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ivan547-arnus/mind-ar-js.git"
+  },
   "license": "MIT",
+  "author": "hiukim",
+  "type": "module",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "files": [
+    "dist/",
+    "src/"
+  ],
+  "scripts": {
+    "dev": "vite --config vite.config.dev.js --host",
+    "watch": "vite build --watch --config vite.config.dev.js",
+    "build-dev": "vite build --config vite.config.dev.js",
+    "build": "vite build --config vite.config.prod.js"
+  },
   "dependencies": {
     "@mediapipe/tasks-vision": "^0.10.9",
     "@msgpack/msgpack": "^2.8.0",
@@ -39,14 +44,13 @@
     "svd-js": "^1.1.1",
     "tinyqueue": "^2.0.3"
   },
+  "devDependencies": {
+    "vite": "^5.0.11"
+  },
   "peerDependencies": {
     "three": ">=0.136.0"
   },
-  "files": [
-    "dist/",
-    "src/"
-  ],
-  "devDependencies": {
-    "vite": "^5.0.11"
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
