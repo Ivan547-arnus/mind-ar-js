@@ -6,6 +6,7 @@ AFRAME.registerSystem('mindar-image-system', {
   video: null,
   processingImage: false,
   shouldFaceUser: false,
+  wakeLocked: false,
   init: function() {
     this.anchorEntities = [];
   },
@@ -39,6 +40,30 @@ AFRAME.registerSystem('mindar-image-system', {
 
     this.ui.showLoading();
     this._startVideo();
+
+    this.requestWakeLock();
+  },
+
+  requestWakeLock: async function() {
+    try {
+      if (!'wakeLock' in navigator) {
+        throw new Error("is not supported");
+      }
+      this.wakeLocked = await navigator.wakeLock.request("screen");
+    } catch (err) {
+      console.log("We cant lock screen:: " + e.message);
+    }
+  },
+
+  releaseWakeLock: async function () {
+    try {
+      if(this.wakeLocked && this.wakeLock.release) {
+        this.wakeLock.release();
+      }
+      console.log("WakeLock released paps")
+    } catch {
+      console.log("We cant realese WakeLock sorry :c");
+    }
   },
 
   switchTarget: function(targetIndex) {
@@ -53,6 +78,7 @@ AFRAME.registerSystem('mindar-image-system', {
     });
     this.video.remove();
     this.controller.dispose();
+    this.releaseWakeLock();
   },
 
   switchCamera: function() {
