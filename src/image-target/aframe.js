@@ -91,7 +91,6 @@ AFRAME.registerSystem('mindar-image-system', {
   _hideAnchors: function() {
     this.el.emit("targetLost");
     if(this.el.object3D.visible) {
-      this.el.object3D.visible = false;
       this.el.object3D.matrix = this.invisibleMatrix;
     }
   },
