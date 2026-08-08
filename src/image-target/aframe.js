@@ -84,6 +84,7 @@ AFRAME.registerSystem('mindar-image-system', {
   switchCamera: function() {
     this.shouldFaceUser = !this.shouldFaceUser;
     this.el.object3D.visible = false;
+    this.el.emit("targetLost");
     this.stop();
     this.start();
   },
