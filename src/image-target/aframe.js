@@ -83,10 +83,19 @@ AFRAME.registerSystem('mindar-image-system', {
 
   switchCamera: function() {
     this.shouldFaceUser = !this.shouldFaceUser;
-    this.el.object3D.visible = false;
-    this.el.emit("targetLost");
+    this._hideAnchors();
     this.stop();
     this.start();
+  },
+
+  _hideAnchors: function() {
+    this.anchorEntities.forEach(({el}) => {
+      if (el.el.object3D.visible) {
+        el.el.emit("targetLost");
+      }
+      el.el.object3D.visible = false;
+      el.el.object3D.matrix = el.invisibleMatrix;
+    });
   },
 
   pause: function(keepVideo=false) {
@@ -229,6 +238,8 @@ AFRAME.registerSystem('mindar-image-system', {
     this.video.style.left = (-(vw - container.clientWidth) / 2) + "px";
     this.video.style.width = vw + "px";
     this.video.style.height = vh + "px";
+
+    container.style.transform = this.shouldFaceUser ? 'scaleX(-1)' : 'none';
   }
 });
 
