@@ -90,17 +90,24 @@ AFRAME.registerSystem("mindar-image-system", {
     });
     this.video.remove();
     this.controller.dispose();
+    this.controller = null;
     this.releaseWakeLock();
+  },
+
+  _hideAnchors: function () {
+    this.anchorEntities.forEach(({ el }) => {
+      if (el.el.object3D.visible) {
+        el.el.emit("targetLost");
+      }
+      el.el.object3D.visible = false;
+      el.el.object3D.matrix = el.invisibleMatrix;
+    });
   },
 
   switchCamera: function () {
     this.shouldFaceUser = !this.shouldFaceUser;
+    this._hideAnchors();
     this.stop();
-    this.el.emit("targetLost");
-    if (this.el.object3D.visible) {
-      this.el.object3D.visible = false;
-      this.el.object3D.matrix = this.invisibleMatrix;
-    }
     this.start();
   },
 
@@ -161,7 +168,7 @@ AFRAME.registerSystem("mindar-image-system", {
     const video = this.video;
     const container = this.container;
 
-    this.controller = new Controller({
+    const controller = new Controller({
       inputWidth: video.videoWidth,
       inputHeight: video.videoHeight,
       maxTrack: this.maxTrack,
@@ -170,6 +177,11 @@ AFRAME.registerSystem("mindar-image-system", {
       missTolerance: this.missTolerance,
       warmupTolerance: this.warmupTolerance,
       onUpdate: (data) => {
+        // ignore stray callbacks from a controller that has since been
+        // disposed/replaced (e.g. by switchCamera), otherwise a late
+        // update can re-show an anchor with a stale matrix.
+        if (this.controller !== controller) return;
+
         if (data.type === "processDone") {
           if (this.mainStats) this.mainStats.update();
         } else if (data.type === "updateMatrix") {
@@ -192,12 +204,13 @@ AFRAME.registerSystem("mindar-image-system", {
         }
       },
     });
+    this.controller = controller;
 
     this._resize();
     window.addEventListener("resize", this._resize.bind(this));
 
     const { dimensions: imageTargetDimensions } =
-      await this.controller.addImageTargets(this.imageTargetSrc);
+      await controller.addImageTargets(this.imageTargetSrc);
 
     for (let i = 0; i < this.anchorEntities.length; i++) {
       const { el, targetIndex } = this.anchorEntities[i];
@@ -206,12 +219,13 @@ AFRAME.registerSystem("mindar-image-system", {
       }
     }
 
-    await this.controller.dummyRun(this.video);
+    await controller.dummyRun(this.video);
+    if (this.controller !== controller) return;
     this.el.emit("arReady");
     this.ui.hideLoading();
     this.ui.showScanning();
 
-    this.controller.processVideo(this.video);
+    controller.processVideo(this.video);
   },
 
   _resize: function () {
